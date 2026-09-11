@@ -67,16 +67,21 @@ export default function LinksManager({
     <div className="mt-8 space-y-8">
       <form
         onSubmit={handleCreate}
-        className="rounded-2xl border border-neutral-800 bg-neutral-900 p-6"
+        className="rounded-[28px] border-2 border-[var(--foreground)] bg-white p-6 shadow-[6px_6px_0_0_var(--red)]"
       >
-        <h2 className="font-medium text-neutral-100">Novo link</h2>
+        <h2 className="flex items-center gap-2 text-lg font-bold text-[var(--foreground)]">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--red)] text-sm text-white">
+            +
+          </span>
+          Novo link
+        </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <input
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Nome do comércio (ex: Padaria do João)"
-            className="rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-neutral-500 sm:col-span-2"
+            className="rounded-xl border-2 border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-[var(--red)] focus:bg-white sm:col-span-2"
           />
           <input
             required
@@ -84,28 +89,32 @@ export default function LinksManager({
             value={destinationUrl}
             onChange={(e) => setDestinationUrl(e.target.value)}
             placeholder="Link do Google Reviews (destino)"
-            className="rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-neutral-500 sm:col-span-2"
+            className="rounded-xl border-2 border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-[var(--red)] focus:bg-white sm:col-span-2"
           />
           <input
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
             placeholder="Identificador do link (opcional, ex: padaria-joao)"
-            className="rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-neutral-500 sm:col-span-2"
+            className="rounded-xl border-2 border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-[var(--red)] focus:bg-white sm:col-span-2"
           />
         </div>
-        {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+        {error && (
+          <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-[var(--red-dark)]">
+            {error}
+          </p>
+        )}
         <button
           type="submit"
           disabled={creating}
-          className="mt-4 rounded-lg bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-900 hover:bg-neutral-300 disabled:opacity-50"
+          className="mt-4 rounded-full bg-[var(--red)] px-5 py-2.5 text-sm font-bold text-white shadow-[3px_3px_0_0_var(--foreground)] transition hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_var(--foreground)] active:translate-y-0 active:shadow-[1px_1px_0_0_var(--foreground)] disabled:opacity-50"
         >
-          {creating ? "Criando..." : "Criar link"}
+          {creating ? "Criando..." : "Criar link ✨"}
         </button>
       </form>
 
       <div className="space-y-4">
         {links.length === 0 && (
-          <p className="text-sm text-neutral-500">
+          <p className="rounded-2xl border-2 border-dashed border-neutral-300 bg-white/60 p-6 text-center text-sm text-neutral-500">
             Nenhum link criado ainda. Crie o primeiro acima.
           </p>
         )}
