@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Backoffice de Links NFC
 
-## Getting Started
+Painel simples para gerenciar os links que ficam gravados nas placas NFC/QR
+code dos comércios. Cada placa aponta para um link **fixo** (ex:
+`https://seudominio.com/r/padaria-joao`), e esse link redireciona para o
+destino que você configurar no painel (ex: página de avaliações do Google).
 
-First, run the development server:
+**A ideia central:** o link/QR code impresso na placa nunca muda. Se você
+precisar trocar para onde ele aponta (ou o comércio mudar de página de
+avaliações), você só edita o destino no painel — a placa física continua
+funcionando para sempre, sem precisar imprimir um novo QR code.
+
+## Como funciona
+
+- `/admin` — painel protegido por senha, onde você cria e edita os links.
+- `/r/<slug>` — a URL pública que vai gravada na placa NFC / impressa no QR
+  code. Redireciona (302) para o destino configurado.
+- O QR code exibido no painel é gerado a partir da URL `/r/<slug>` — como
+  essa URL nunca muda, o QR code impresso também nunca precisa mudar.
+
+## Rodando localmente
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra http://localhost:3000 — vai te levar para `/admin/login`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Em desenvolvimento, os links são salvos num arquivo SQLite local
+(`.data/app.db`, já ignorado pelo git). Não precisa configurar banco de dados
+nenhum para testar.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+A senha de admin e a chave de sessão já estão em `.env.local` (gerado
+automaticamente). **Troque a senha** (`ADMIN_PASSWORD`) antes de usar de
+verdade.
 
-## Learn More
+## Publicando na Vercel
 
-To learn more about Next.js, take a look at the following resources:
+1. Suba este projeto para um repositório no GitHub e importe na Vercel
+   (https://vercel.com/new).
+2. Em **Settings → Environment Variables**, adicione:
+   - `ADMIN_PASSWORD` — a senha do painel.
+   - `SESSION_SECRET` — uma string aleatória (gere com
+     `openssl rand -hex 32`).
+   - `DATABASE_URL` — connection string de um Postgres (veja abaixo).
+3. Deploy.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Banco de dados em produção
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Localmente o projeto usa SQLite (arquivo), mas em produção na Vercel o
+sistema de arquivos não é persistente — por isso é preciso um banco de
+verdade. O projeto já está pronto para isso: basta definir `DATABASE_URL` que
+ele passa a usar Postgres automaticamente (mesmo código, sem precisar mudar
+nada).
 
-## Deploy on Vercel
+Caminho mais simples: no seu projeto na Vercel, vá em **Storage → Create
+Database → Postgres** (via marketplace, ex. Neon), e a Vercel te dá a
+`DATABASE_URL` pronta para colar nas variáveis de ambiente.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Domínio próprio
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Depois de conectar um domínio próprio na Vercel, os links passam a ser algo
+como `https://suamarca.com/r/padaria-joao` — é esse link que você grava nas
+placas NFC e imprime como QR code.
+
+## Estrutura
+
+- `app/r/[slug]/route.ts` — redirecionamento público.
+- `app/admin/` — painel (login + dashboard).
+- `app/api/links/` — CRUD dos links (protegido por sessão de admin).
+- `lib/db.ts` — camada de dados (SQLite local / Postgres em produção).
+- `lib/auth.ts` — sessão simples por cookie assinado (HMAC).
