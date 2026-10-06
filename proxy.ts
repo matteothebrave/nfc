@@ -8,7 +8,8 @@ export async function proxy(request: NextRequest) {
   const isLoginApi = pathname === "/api/auth/login";
   const needsAuth =
     (pathname.startsWith("/admin") && !isLoginPage) ||
-    (pathname.startsWith("/api/links") && !isLoginApi);
+    (pathname.startsWith("/api/links") && !isLoginApi) ||
+    pathname.startsWith("/api/places");
 
   if (!needsAuth) return NextResponse.next();
 
@@ -27,5 +28,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/links/:path*"],
+  matcher: ["/admin/:path*", "/api/links/:path*", "/api/places/:path*"],
 };

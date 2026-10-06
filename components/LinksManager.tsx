@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import type { LinkRecord } from "@/lib/db";
+import { reviewLinkFromPlaceId } from "@/lib/places";
 import LinkCard from "@/components/LinkCard";
+import PlaceSearch from "@/components/PlaceSearch";
 
 export default function LinksManager({
   initialLinks,
@@ -76,6 +78,14 @@ export default function LinksManager({
           Novo link
         </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <PlaceSearch
+              onSelect={(place) => {
+                setName(place.name);
+                setDestinationUrl(reviewLinkFromPlaceId(place.placeId));
+              }}
+            />
+          </div>
           <input
             required
             value={name}

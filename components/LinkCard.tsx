@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import QRCode from "qrcode";
 import type { LinkRecord } from "@/lib/db";
+import { reviewLinkFromPlaceId } from "@/lib/places";
+import PlaceSearch from "@/components/PlaceSearch";
 
 export default function LinkCard({
   link,
@@ -77,7 +79,11 @@ export default function LinkCard({
               onChange={(e) => onUpdate(link.id, { active: e.target.checked })}
               className="accent-[var(--red)]"
             />
-            <span className={link.active ? "text-[var(--red-dark)]" : "text-neutral-400"}>
+            <span
+              className={
+                link.active ? "text-[var(--red-dark)]" : "text-neutral-400"
+              }
+            >
               {link.active ? "Ativo" : "Inativo"}
             </span>
           </label>
@@ -85,29 +91,36 @@ export default function LinkCard({
 
         <div className="mt-3">
           {editing ? (
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <input
-                type="url"
-                value={destinationUrl}
-                onChange={(e) => setDestinationUrl(e.target.value)}
-                className="flex-1 rounded-xl border-2 border-neutral-200 bg-neutral-50 px-3 py-1.5 text-sm text-neutral-900 outline-none focus:border-[var(--red)] focus:bg-white"
+            <div className="space-y-2">
+              <PlaceSearch
+                onSelect={(place) =>
+                  setDestinationUrl(reviewLinkFromPlaceId(place.placeId))
+                }
               />
-              <div className="flex gap-2">
-                <button
-                  onClick={saveDestination}
-                  className="rounded-full bg-[var(--red)] px-4 py-1.5 text-sm font-bold text-white shadow-[2px_2px_0_0_var(--foreground)] transition hover:-translate-y-0.5"
-                >
-                  Salvar
-                </button>
-                <button
-                  onClick={() => {
-                    setDestinationUrl(link.destinationUrl);
-                    setEditing(false);
-                  }}
-                  className="rounded-full border-2 border-neutral-200 px-4 py-1.5 text-sm font-medium text-neutral-500 hover:bg-neutral-50"
-                >
-                  Cancelar
-                </button>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <input
+                  type="url"
+                  value={destinationUrl}
+                  onChange={(e) => setDestinationUrl(e.target.value)}
+                  className="flex-1 rounded-xl border-2 border-neutral-200 bg-neutral-50 px-3 py-1.5 text-sm text-neutral-900 outline-none focus:border-[var(--red)] focus:bg-white"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={saveDestination}
+                    className="rounded-full bg-[var(--red)] px-4 py-1.5 text-sm font-bold text-white shadow-[2px_2px_0_0_var(--foreground)] transition hover:-translate-y-0.5"
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDestinationUrl(link.destinationUrl);
+                      setEditing(false);
+                    }}
+                    className="rounded-full border-2 border-neutral-200 px-4 py-1.5 text-sm font-medium text-neutral-500 hover:bg-neutral-50"
+                  >
+                    Cancelar
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
